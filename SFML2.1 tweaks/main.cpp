@@ -31,8 +31,6 @@ int main()
 		std::cout << "Cannot load arial.ttf" << std::endl;
 	}
 
-	window.pushGLStates();
-
 	//
 	// create shader program
 	//
@@ -87,6 +85,7 @@ int main()
     glGenBuffers(1, &trianglesId);
     glBindBuffer(GL_ARRAY_BUFFER, trianglesId);
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//
 	// create the quad vertex buffer
@@ -103,6 +102,7 @@ int main()
     glGenBuffers(1, &quadId);
     glBindBuffer(GL_ARRAY_BUFFER, quadId);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//
 	// defines the orthographic projection matrix
@@ -131,8 +131,6 @@ int main()
     m[14] = -(farPlane + nearPlane) / (farPlane - nearPlane);
     m[15] = 1.0f;
 
-	window.popGLStates();
-
 	bool running = true;
     while (running)
     {
@@ -143,14 +141,11 @@ int main()
 				running = false;
         }
 
-		window.resetGLStates();
-
         window.clear();
+		window.resetGLStates();
 		sf::CircleShape shape(200.f);
 		shape.setFillColor(sf::Color::Green);
         window.draw(shape);
-
-		window.pushGLStates();
 
 		//
 		// rendering
@@ -182,11 +177,10 @@ int main()
 		glVertexAttribPointer(POSITION_ATTRIBUTE_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(POSITION_ATTRIBUTE_INDEX);
-
-		window.popGLStates();
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glUseProgram(0);
 
 		window.resetGLStates();
-
 		sf::Text text;
 		text.setFont(font);
 		text.setString("Hello world");
